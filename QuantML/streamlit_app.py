@@ -572,3 +572,4 @@ with tab5:
 ## QuantML · Stock Price Predictor
 
 ### Project structure
+"""
