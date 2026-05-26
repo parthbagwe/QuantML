@@ -117,9 +117,9 @@ def chart_candlestick(df, n=90):
         name="OHLC", showlegend=False,
     ), row=1, col=1)
     for col, colour, dash, lbl in [
-        ("ma_20",  "#00d4aa", "solid", "MA-20"),
-        ("ma_50",  "#f59e0b", "dash",  "MA-50"),
-        ("ma_200", "#8b5cf6", "dot",   "MA-200"),
+        ("ma_20","#00d4aa","solid","MA-20"),
+        ("ma_50","#f59e0b","dash","MA-50"),
+        ("ma_200","#8b5cf6","dot","MA-200"),
     ]:
         if col in sub.columns and sub[col].notna().any():
             fig.add_trace(go.Scatter(
@@ -154,12 +154,12 @@ def chart_actual_vs_predicted(result, model_name):
 
 def chart_model_comparison(all_results):
     names  = list(all_results.keys())
-    labels = [n.replace("_", " ").title() for n in names]
-    cols   = [COLOURS.get(n, "#888") for n in names]
+    labels = [n.replace("_"," ").title() for n in names]
+    cols   = [COLOURS.get(n,"#888") for n in names]
 
     fig = make_subplots(rows=1, cols=3,
-                        subplot_titles=["R² Score", "RMSE", "MAE"])
-    for col_idx, key in enumerate(["R2", "RMSE", "MAE"], 1):
+                        subplot_titles=["R² Score","RMSE","MAE"])
+    for col_idx, key in enumerate(["R2","RMSE","MAE"], 1):
         vals = [all_results[n]["metrics"][key] for n in names]
         fig.add_trace(go.Bar(
             x=labels, y=vals, marker_color=cols, showlegend=False,
@@ -199,9 +199,9 @@ def chart_moving_averages(df):
         line=dict(color="rgba(226,232,244,0.5)", width=0.8),
     ))
     for col, colour, dash, lbl in [
-        ("ma_20",  "#00d4aa", "solid", "MA-20"),
-        ("ma_50",  "#f59e0b", "dash",  "MA-50"),
-        ("ma_200", "#8b5cf6", "dot",   "MA-200"),
+        ("ma_20","#00d4aa","solid","MA-20"),
+        ("ma_50","#f59e0b","dash","MA-50"),
+        ("ma_200","#8b5cf6","dot","MA-200"),
     ]:
         if col in df.columns:
             fig.add_trace(go.Scatter(
@@ -222,7 +222,7 @@ def chart_rsi(df):
                   annotation_text="Overbought (70)")
     fig.add_hline(y=30, line_dash="dash", line_color="#22c55e",
                   annotation_text="Oversold (30)")
-    fig.update_layout(**PL, title="RSI-14", height=260, yaxis_range=[0, 100])
+    fig.update_layout(**PL, title="RSI-14", height=260, yaxis_range=[0,100])
     return fig
 
 
@@ -248,8 +248,8 @@ def chart_macd(df):
 
 def chart_heatmap(df):
     cols = [c for c in [
-        "close", "open", "high", "low", "volume", "ma_20", "ma_50",
-        "rsi_14", "macd", "bb_width", "daily_return", "volume_ratio", "close_lag1",
+        "close","open","high","low","volume","ma_20","ma_50",
+        "rsi_14","macd","bb_width","daily_return","volume_ratio","close_lag1",
     ] if c in df.columns]
     corr = df[cols].corr().round(2)
     fig = go.Figure(go.Heatmap(
@@ -278,6 +278,7 @@ def chart_volume(df):
 
 
 def chart_feature_importance(model, feature_cols, model_name):
+    import numpy as np
     if hasattr(model, "feature_importances_"):
         imp = model.feature_importances_
     elif hasattr(model, "coef_"):
@@ -286,16 +287,16 @@ def chart_feature_importance(model, feature_cols, model_name):
         return None
     top = 15
     idx   = np.argsort(imp)[-top:]
-    feats = [feature_cols[i].replace("_", " ") for i in idx]
+    feats = [feature_cols[i].replace("_"," ") for i in idx]
     vals  = imp[idx]
     fig = go.Figure(go.Bar(
         x=vals, y=feats, orientation="h",
-        marker=dict(color=vals, colorscale=[[0, "#1a3a2a"], [1, "#00d4aa"]]),
+        marker=dict(color=vals, colorscale=[[0,"#1a3a2a"],[1,"#00d4aa"]]),
         text=[f"{v:.4f}" for v in vals], textposition="outside",
     ))
     fig.update_layout(
         **PL,
-        title=f"Feature Importance — {model_name.replace('_', ' ').title()}",
+        title=f"Feature Importance — {model_name.replace('_',' ').title()}",
         height=460,
     )
     return fig
@@ -314,8 +315,8 @@ with st.sidebar:
 
     model_name    = st.selectbox(
         "ML Model",
-        ["xgboost", "random_forest", "decision_tree", "linear_regression"],
-        format_func=lambda x: x.replace("_", " ").title(),
+        ["xgboost","random_forest","decision_tree","linear_regression"],
+        format_func=lambda x: x.replace("_"," ").title(),
     )
     forecast_days = st.slider("Forecast days", 7, 90, 30, step=7)
     run_btn       = st.button("▶  Run Prediction", use_container_width=True)
@@ -342,7 +343,7 @@ elif use_sample:
             from datetime import datetime, timedelta
             raw = yf.download(
                 "AAPL",
-                start=(datetime.today() - timedelta(days=5 * 365)).strftime("%Y-%m-%d"),
+                start=(datetime.today() - timedelta(days=5*365)).strftime("%Y-%m-%d"),
                 end=datetime.today().strftime("%Y-%m-%d"),
                 auto_adjust=True, progress=False,
             )
@@ -389,7 +390,7 @@ with tab1:
     else:
         from src.preprocess import get_summary_stats
         s = get_summary_stats(df)
-        c1, c2, c3, c4, c5 = st.columns(5)
+        c1,c2,c3,c4,c5 = st.columns(5)
         c1.metric("Latest Price",  f"${s['price_latest']:,.2f}")
         c2.metric("Total Return",  f"{s['price_change_pct']:+.1f}%",
                   delta=f"{s['price_change_pct']:+.1f}%")
@@ -414,12 +415,12 @@ with tab1:
         if result:
             m = result["metrics"]
             st.subheader("Model Performance")
-            c1, c2, c3, c4, c5 = st.columns(5)
-            c1.metric("R² Score",      f"{m['R2']:.4f}")
-            c2.metric("RMSE",          f"${m['RMSE']:.2f}")
-            c3.metric("MAE",           f"${m['MAE']:.2f}")
-            c4.metric("MAPE",          f"{m['MAPE']:.2f}%")
-            c5.metric("Dir. Accuracy", f"{m['Directional_Accuracy']:.1f}%")
+            c1,c2,c3,c4,c5 = st.columns(5)
+            c1.metric("R² Score",       f"{m['R2']:.4f}")
+            c2.metric("RMSE",           f"${m['RMSE']:.2f}")
+            c3.metric("MAE",            f"${m['MAE']:.2f}")
+            c4.metric("MAPE",           f"{m['MAPE']:.2f}%")
+            c5.metric("Dir. Accuracy",  f"{m['Directional_Accuracy']:.1f}%")
             st.plotly_chart(
                 chart_actual_vs_predicted(result, st.session_state.last_model),
                 use_container_width=True,
@@ -450,12 +451,12 @@ with tab2:
             for name, r in all_r.items():
                 m = r["metrics"]
                 rows.append({
-                    "Model":             name.replace("_", " ").title(),
-                    "R²":                m["R2"],
-                    "RMSE":              m["RMSE"],
-                    "MAE":               m["MAE"],
-                    "MAPE (%)":          m["MAPE"],
-                    "Dir. Accuracy (%)": m["Directional_Accuracy"],
+                    "Model":            name.replace("_"," ").title(),
+                    "R²":               m["R2"],
+                    "RMSE":             m["RMSE"],
+                    "MAE":              m["MAE"],
+                    "MAPE (%)":         m["MAPE"],
+                    "Dir. Accuracy (%)":m["Directional_Accuracy"],
                 })
             st.dataframe(
                 pd.DataFrame(rows).set_index("Model"),
@@ -472,8 +473,8 @@ with tab2:
             for name, r in all_r.items():
                 fig.add_trace(go.Scatter(
                     x=r["dates"], y=r["predicted"],
-                    name=name.replace("_", " ").title(),
-                    line=dict(color=COLOURS.get(name, "#888"),
+                    name=name.replace("_"," ").title(),
+                    line=dict(color=COLOURS.get(name,"#888"),
                               width=1.2, dash="dot"),
                 ))
             fig.update_layout(**PL, height=400, title="All Models vs Actual")
@@ -483,9 +484,9 @@ with tab2:
             best = max(all_r, key=lambda k: all_r[k]["metrics"]["R2"])
             try:
                 from src.train import load_model, load_feature_columns
-                bm    = load_model(best)
+                bm   = load_model(best)
                 fcols = [f for f in load_feature_columns() if f in df.columns]
-                fi    = chart_feature_importance(bm, fcols, best)
+                fi   = chart_feature_importance(bm, fcols, best)
                 if fi:
                     st.plotly_chart(fi, use_container_width=True)
             except Exception:
@@ -553,28 +554,14 @@ with tab4:
                           f"${fc['forecast'][-1]:,.2f}",
                           delta=f"{fc['price_change_pct']:+.2f}%")
                 st.metric("Trend", fc["trend"])
-
                 if "rsi_14" in df.columns:
                     rsi = df["rsi_14"].iloc[-1]
-                    st.metric(
-                        "RSI-14",
-                        f"{rsi:.1f}",
-                        delta="Overbought" if rsi > 70 else
-                              "Oversold"   if rsi < 30 else "Neutral",
-                        delta_color="inverse" if rsi > 70 else
-                                    "normal"  if rsi < 30 else "off",
-                    )
-
-                # ── FIX: guard both macd and macd_signal columns ──────────────
-                if "macd" in df.columns and "macd_signal" in df.columns:
-                    is_buy = df["macd"].iloc[-1] > df["macd_signal"].iloc[-1]
-                    sig    = "BUY" if is_buy else "SELL"
-                    st.metric(
-                        "MACD Signal",
-                        sig,
-                        delta="Bullish crossover" if is_buy else "Bearish crossover",
-                        delta_color="normal" if is_buy else "inverse",
-                    )
+                    st.metric("RSI-14", f"{rsi:.1f}",
+                              delta="Overbought" if rsi > 70 else
+                                    "Oversold"   if rsi < 30 else "Neutral")
+                if "macd" in df.columns:
+                    sig = "BUY" if df["macd"].iloc[-1] > df["macd_signal"].iloc[-1] else "SELL"
+                    st.metric("MACD Signal", sig)
 
 
 # ════════════════════════════════════════
@@ -586,77 +573,46 @@ with tab5:
 
 ### Project structure
 
-```
-QuantML/
-├── streamlit_app.py        ← this file (frontend)
-├── run_training.py         ← trains & saves all 4 models
-├── src/
-│   ├── preprocess.py       ← load_and_clean(), get_summary_stats()
-│   ├── features.py         ← add_features()  (MAs, RSI, MACD, BB…)
-│   ├── train.py            ← train_model(), load_model(), load_feature_columns()
-│   └── predict.py          ← predict_test_set(), forecast_n_days(),
-│                              all_models_predict_test()
-├── models/                 ← saved .pkl files (created by run_training.py)
-└── requirements.txt
-```
+    stock-predictor/
+    ├── data/raw/              ← Kaggle CSV uploads
+    ├── data/processed/        ← cleaned + featured data
+    ├── src/
+    │   ├── preprocess.py      ← cleaning, normalization
+    │   ├── features.py        ← 28 technical indicators
+    │   ├── train.py           ← TimeSeriesSplit training
+    │   ├── evaluate.py        ← metrics + matplotlib charts
+    │   └── predict.py         ← inference + N-day forecast
+    ├── models/                ← saved .pkl files + metrics.json
+    ├── app/
+    │   ├── main.py            ← FastAPI REST API
+    │   └── schemas.py         ← Pydantic validation
+    ├── streamlit_app.py       ← this file
+    ├── run_training.py        ← one-command training
+    └── requirements.txt
 
----
+### Commands
 
-### Models
+    # Install
+    python -m venv venv && source venv/bin/activate
+    pip install -r requirements.txt
 
-| Model | Strengths |
-|---|---|
-| **XGBoost** | Handles non-linearity, fast, often best R² |
-| **Random Forest** | Robust to outliers, low variance |
-| **Decision Tree** | Interpretable, quick baseline |
-| **Linear Regression** | Transparent, great benchmark |
+    # Train models
+    python run_training.py
+    python run_training.py --csv myfile.csv
 
----
+    # Run dashboard
+    streamlit run streamlit_app.py
 
-### Feature engineering
+    # Run API
+    uvicorn app.main:app --reload
 
-The `add_features()` function computes:
+### Deploy to Streamlit Cloud
 
-- **Moving averages** — MA-20, MA-50, MA-200
-- **RSI-14** — Relative Strength Index
-- **MACD** — line, signal, histogram
-- **Bollinger Bands** — upper, lower, width
-- **Volume ratio** — volume / MA-20 volume
-- **Lagged close** — close_lag1, close_lag5
-- **Daily return** — percentage change
+    git init
+    git add .
+    git commit -m "feat: stock predictor"
+    git remote add origin https://github.com/YOUR_NAME/stock-predictor.git
+    git push -u origin main
 
----
-
-### Quickstart
-
-```bash
-# 1 — Install dependencies
-pip install -r requirements.txt
-
-# 2 — Train all models
-python run_training.py
-
-# 3 — Launch the app
-streamlit run streamlit_app.py
-```
-
----
-
-### Deployment (Streamlit Cloud)
-
-1. Push this repo to GitHub.
-2. Go to [share.streamlit.io](https://share.streamlit.io) → **New app**.
-3. Select your repo, branch, and set **Main file path** to `streamlit_app.py`.
-4. Add any secrets under **Advanced settings → Secrets** if needed.
-5. Click **Deploy** — done!
-
-> **Note:** Pre-train your models locally and commit the `models/` folder,
-> or add a `run_training.py` call inside the app's startup logic so that
-> models are trained on first run in the cloud environment.
-
----
-
-### Tech stack
-
-`streamlit` · `plotly` · `pandas` · `numpy` · `scikit-learn` · `xgboost` · `yfinance`
-    """)
+Then go to share.streamlit.io → New app → select repo → streamlit_app.py → Deploy
+""")
